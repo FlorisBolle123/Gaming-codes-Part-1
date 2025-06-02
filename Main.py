@@ -1,54 +1,66 @@
+#importing modules
 import pgzrun
 from random import randint
+from time import time
 
-WIDTH=600
-HEIGHT=500
+#setting screen size
+WIDTH=800
+HEIGHT=600
 
-score = 0
-game_over=False
+#making variables
+satellites=[]
+lines=[]
+next_satellite=0
 
-tom=Actor("tom")
-tom.pos=100,100
+start_time = 0
+total_time = 0
+end_time = 0
 
-jerry=Actor("jerry")
-jerry.pos=200,200
+number_of_satellite=8
 
+#Creating and setting the limit of how many satellites and where they are
+def create_satellites():
+    global start_time
+    for count in range(0,number_of_satellite):
+        satellite=Actor("setalite")
+        satellite.pos=randint(40,WIDTH-40), randint(40,HEIGHT-40)
+        satellites.append(satellite)
+    start_time=time()
+
+#Makes everything be drawn on your screen
 def draw():
-    screen.blit("house",(0,0))
-    tom.draw()
-    jerry.draw()
-    screen.draw.text("Score : "+str(score),color="black",topleft=(10,10))
+    global total_time
+    screen.blit("bg",(0,0))
+    number =1
+    for satellite in satellites:
+        screen.draw.text(str(number),(satellite.pos[0],satellite.pos[1]+20))
+        satellite.draw()
+        number=number+1
 
-    if game_over:
-        screen.fill("black")
-        screen.draw.text("Times up! Your final score: "+str(score),midtop=(WIDTH/2,10),fontsize=40,color="violet")
-
-def place_jerry():
-    jerry.x=randint(50,(WIDTH-50))
-    jerry.y=randint(50,(HEIGHT-50))
-
-def time_up():
-    global game_over
-    game_over=True
+    if next_satellite < number_of_satellite:
+        total_time=time() - start_time
+        screen.draw.text(str(round(total_time)),(10,10),fontsize=30)
+    else:
+        screen.draw.text(str(round(total_time)),(10,10),fontsize=30)
+    	
+    for i in lines:
+        screen.draw.line(i[0],i[1],(255,255,255))
 
 def update():
-    global score
+    pass
 
-    if keyboard.left:
-        tom.x=tom.x-2
-    if keyboard.right:
-        tom.x=tom.x+2
-    if keyboard.up:
-        tom.y=tom.y-2
-    if keyboard.down:
-        tom.y=tom.y+2
+#Making the mouse adjustments for the game
+def on_mouse_down(pos):
+    global next_satellite,lines
+    if next_satellite < number_of_satellite:
+        if satellites[next_satellite].collidepoint(pos):
+            if next_satellite:
+                lines.append((satellites[next_satellite-1].pos, satellites[next_satellite].pos))
+            next_satellite = next_satellite+1
+        else:
+            lines=[]
+            next_satellite=0
 
-    jerry_collected=tom.colliderect(jerry)
-
-    if jerry_collected:
-        score=score+10
-        place_jerry()
-
-clock.schedule(time_up,60.0)
+create_satellites()
 
 pgzrun.go()
