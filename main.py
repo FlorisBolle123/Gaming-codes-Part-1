@@ -1,38 +1,44 @@
 import pgzrun
 from random import randint
+from time import time
 
-#setting up screen
-TITLE="SHREK HIT"
-WIDTH=500
-HEIGHT=500
+WIDTH=800
+HEIGHT=600
 
-#adding shrek and text to display
-shrek=Actor('shrek')
-bg=Actor('th')
+cheeses=[]
 
-message=" "
+start_time=0
+total_time=0
+end_time=0
 
-#Function draw so shrek and other things can be shown
-def draw():
-    screen.clear()
-    bg.draw()
-    shrek.draw()
-    screen.draw.text(message, center=(400,10),fontsize=30)
+number_of_cheese=10
 
-#defining positition for shrek
-def place_shrek():
-    shrek.x=randint(50,WIDTH-50)
-    shrek.y=randint(50,HEIGHT-50)
+def create_cheese():
+    global start_time
+    for count in range(0,number_of_cheese):
+        cheese=Actor("cheese")
+        cheese.pos=randint(40,WIDTH-40), randint(40,HEIGHT-40)
+        cheeses.append(cheese)
+    start_time=time()
 
-#making the mouse button interact
 def on_mouse_down(pos):
-    global message
-    if shrek.collidepoint(pos):
-        message="You hit me!!"
-        place_shrek()
-    else:
-        message="You missed me!!"
+    #global mouse
+    for i in cheeses:
+        #if cheeses[i].collidepoint(pos):
+            #mouse=Actor("rat_mouse")
 
-place_shrek()
 
+def draw():
+    global total_time
+    screen.blit("bg",(0,0))
+    number=1
+    for cheese in cheeses:
+        screen.draw.text(str(number),(cheese.pos[0],cheese.pos[1]+20))
+        cheese.draw()
+        number=number+1
+
+    
+    
+
+create_cheese()
 pgzrun.go()
